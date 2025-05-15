@@ -12,3 +12,14 @@ export type GetRequestDto = {
 export type CreateRequestDto = Omit<GetRequestDto, "id" | "status" | "updated_at" | "created_at">;
 
 export type UpdateRequestDto = Partial<GetRequestDto>;
+
+import {z} from "zod"
+
+export const CreateRequestSchema = z.object({
+    subject: z.string()
+        .min(5, "less than 5 chars")
+        .max(30, "more than 30 chars"),
+    text: z.string()
+        .min(15, "less than 15 chars")
+        .max(255, "more than 255 chars"),
+});

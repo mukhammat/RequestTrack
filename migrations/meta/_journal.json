@@ -43,6 +43,13 @@
       "when": 1747255206843,
       "tag": "0005_strange_stellaris",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1747268398498,
+      "tag": "0006_colorful_scourge",
+      "breakpoints": true
     }
   ]
 }

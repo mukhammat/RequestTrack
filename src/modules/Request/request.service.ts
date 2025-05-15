@@ -57,6 +57,9 @@ export class RequestService implements IRequestService {
             .where(eq(request.status, WORKING))
             .returning({ id: request.id });
         //this.hasData(result);
+        if(!result.length) {
+            throw Error("")
+        }
 
         return result.map(r => r.id);
     }

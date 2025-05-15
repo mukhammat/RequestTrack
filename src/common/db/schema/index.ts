@@ -10,7 +10,7 @@ export const RequestStatusEnum = pgEnum("request_status_enum", [
 ]);
 
 export const request = table("request", {
-    id: t.uuid().primaryKey().default(randomUUID()).notNull(),
+    id: t.uuid().primaryKey().notNull().defaultRandom(),
     subject: t.varchar("subject", { length: 256 }).notNull(),
     text: t.text("text").notNull(),
     status: RequestStatusEnum().notNull().default('new'),

@@ -18,8 +18,8 @@ const PORT = process.env.PORT || 3000;
             process.exit(0);
         };
 
-        process.on("SIGINT", gracefulShutdown);
-        process.on("SIGTERM", gracefulShutdown);
+        // process.on("SIGINT", gracefulShutdown);
+        // process.on("SIGTERM", gracefulShutdown);
 
     } catch (error) {
         console.error("Failed to start server:", error);
