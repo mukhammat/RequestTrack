@@ -1,11 +1,7 @@
-import { HTTPException } from "hono/http-exception"
+import { HttpException } from "./http";
 
-export class NotFoundException extends HTTPException {
-    constructor(entity:  string) {
-        const message = `${entity} not found!`;
-        super(404, {
-            "message": message
-        });
-        this.name = "NotFoundException";
+export class NotFoundException extends HttpException {
+    constructor(message = "Not Found") {
+        super(404, message);
     }
 }
