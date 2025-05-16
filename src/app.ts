@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import router from "./routers";
 import cors from "cors";
+import { errorHanler } from "@middleware";
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.use("/api", router);
 app.get("/check", (_req, res) => {
     res.status(404).json({ message: "Check..." });
 });
+app.use(errorHanler)
 app.use((_req, res) => {
     res.status(404).json({ message: "Not found" });
 });
