@@ -1,5 +1,5 @@
 import { DrizzleClient, request, TransactionType } from "@db";
-import { eq, ne } from "drizzle-orm";
+import { and, between, eq, gte, lte, ne } from "drizzle-orm";
 import { 
     CreateRequestDto,
     StatusEnum,
@@ -8,7 +8,10 @@ import {
     WORKING,
     COMPLETED,
     CANCELED,
-    ChangeRequestStatusDto
+    ChangeRequestStatusDto,
+    GetRequestType,
+    GetAllRequestDto,
+    Options
 } from ".";
 import { BadRequestException, NotFoundException } from "@exceptions";
 
@@ -17,6 +20,7 @@ export interface IRequestService {
     createRequest(data: CreateRequestDto): Promise<string>
     changeRequestStatus(data: ChangeRequestStatusDto): Promise<string>
     cancelAllOnWorking(): Promise<string[]>
+    getAllRequest(options: any): Promise<GetRequestType[]>
 }
 
 
@@ -53,7 +57,7 @@ export class RequestService implements IRequestService {
         const [req] = await tx.update(request).set({
             status,
             result
-        }).where(eq(request.id, requestId) && ne(request.status, status))
+        }).where(and(eq(request.id, requestId), ne(request.status, status)))
         .returning({id: request.id});
 
         if(!req) {
@@ -144,5 +148,49 @@ export class RequestService implements IRequestService {
         }
 
         return result.map(r => r.id);
+    }
+
+    public async getAllRequest({ date, from, to }: GetAllRequestDto) {
+        const conditions: any[] = [];
+
+        if (date) {
+            const start = new Date(date);
+            start.setHours(0,0,0,0);
+            const end   = new Date(date);
+            end.setHours(23, 59, 59, 999);
+
+            conditions.push( and(
+                gte(request.created_at, start),
+                lte(request.created_at, end),
+            ));
+        }
+
+
+        if (from && to) {
+            const dateFrom = new Date(from);
+            const dateTo   = new Date(to);
+            conditions.push(
+                between(request.created_at, dateFrom, dateTo)
+            );
+        } else {
+            if (from) {
+                conditions.push(
+                    gte(request.created_at, new Date(from))
+                );
+            }
+
+            if (to) {
+                conditions.push(
+                    lte(request.created_at, new Date(to))
+                );
+            }
+        }
+
+        const options: Options = {};
+        if (conditions.length > 0) {
+            options.where = and(...conditions);
+        }
+
+        return this.db.query.request.findMany(options);
     }
 }

@@ -1,11 +1,11 @@
 {
     "name": "ResquestTrack",
     "version": "1.0.0",
-    "main": "dist/index.js",
+    "main": "dist/src/index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "dev": "nodemon --watch ts-node -r tsconfig-paths/register src/index.ts",
-        "start": "node -r tsconfig-paths/register dist/index.js",
+        "dev": "nodemon -w src -e ts,js,json -i dist -x \"ts-node -r tsconfig-paths/register src/index.ts\"",
+        "start": "node -r tsconfig-paths/register dist/src/index.js",
         "build": "tsc -p . && tsc-alias"
     },
     "keywords": [],

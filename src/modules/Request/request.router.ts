@@ -29,5 +29,6 @@ export class RequestRouter implements IRequestRouter {
         .patch("/take-request", this.bindAsyncHandler("takeRequest"))
         .patch("/cancel", this.bindAsyncHandler("cancelRequest"))
         .patch("/complete", this.bindAsyncHandler("completeRequest"))
+        .get("/get-all", this.bindAsyncHandler("getAllRequest"))
     }
 }

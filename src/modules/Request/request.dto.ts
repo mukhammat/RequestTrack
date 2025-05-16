@@ -13,19 +13,19 @@ const Status = {
 
 export type StatusEnum = typeof Status[keyof typeof Status];
 
-export type GetRequestDto = {
-    id: string,
-    subject: string,
-    text: string,
-    status: StatusEnum,
-    result: string,
-    created_at: string | null;
-    updated_at: Date | null;
+export type GetRequestType = {
+    id: string
+    subject: string
+    text: string
+    status: StatusEnum
+    result: string | null
+    created_at: Date | null
+    updated_at: Date | null
 };
 
-export type CreateRequestDto = Omit<GetRequestDto, "id" | "status" | "updated_at" | "created_at" | "result">;
+export type CreateRequestDto = Omit<GetRequestType, "id" | "status" | "updated_at" | "created_at" | "result">;
 
-export type UpdateRequestDto = Partial<GetRequestDto>;
+export type UpdateRequestDto = Partial<GetRequestType>;
 
 import { TransactionType } from "@db";
 
@@ -52,3 +52,13 @@ export const CreateRequestSchema = z.object({
         .min(15, "less than 15 chars")
         .max(255, "more than 255 chars"),
 });
+
+export type GetAllRequestDto = {
+    date?: string
+    from?: string
+    to?: string
+}
+
+export type Options = {
+    where?: any
+}

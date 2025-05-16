@@ -7,6 +7,7 @@ export interface IRequestController {
     takeRequest(req: Request, res: Response): Promise<void>
     completeRequest(req: Request, res: Response): Promise<void>
     cancelRequest(req: Request, res: Response): Promise<void>
+    getAllRequest(req: Request, res: Response): Promise<void>
 }
 
 export class RequestController {
@@ -15,6 +16,7 @@ export class RequestController {
 
     public async createRequest(_req: Request, res: Response) {
         const { subject, text } = res.locals.validatedData;
+        console.log("createRequest");
         console.log("Subject", subject, "/n", "Text", text);
         const id = await this.requestService.createRequest({subject, text});
         console.log("Id", id);
@@ -42,5 +44,12 @@ export class RequestController {
         const {requestId, result} = req.body;
         await this.requestService.changeRequestStatus({requestId, status: CANCELED, result});
         res.status(200).send({data: null, message: "Request is canceled"});
+    }
+
+    public async getAllRequest(req: Request, res: Response) {
+        const {date, from, to} = req.query;
+        console.log("getAllRequest!!");
+        const result = await this.requestService.getAllRequest({date, from, to});
+        res.status(200).send({data: {result}, message: null});
     }
 }
