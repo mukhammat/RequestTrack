@@ -50,6 +50,13 @@
       "when": 1747268398498,
       "tag": "0006_colorful_scourge",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1747346016021,
+      "tag": "0007_high_pyro",
+      "breakpoints": true
     }
   ]
 }

@@ -1,72 +1,148 @@
-import { DrizzleClient, request } from "@db";
-import { CreateRequestDto, GetRequestDto, StatusEnum, UpdateRequestDto } from ".";
+import { DrizzleClient, request, TransactionType } from "@db";
 import { eq, ne } from "drizzle-orm";
+import { 
+    CreateRequestDto,
+    StatusEnum,
+    UpdateStatusDto,
+    NEW,
+    WORKING,
+    COMPLETED,
+    CANCELED,
+    ChangeRequestStatusDto
+} from ".";
+import { BadRequestException, NotFoundException } from "@exceptions";
 
 
 export interface IRequestService {
     createRequest(data: CreateRequestDto): Promise<string>
-    updateStatus(requestId: string, status: StatusEnum): Promise<string>
-    getRequestById(id: string): Promise<GetRequestDto>
+    changeRequestStatus(data: ChangeRequestStatusDto): Promise<string>
     cancelAllOnWorking(): Promise<string[]>
 }
 
-const 
-    WORKING = "working",
-    CANCELED = "canceled";
 
 export class RequestService implements IRequestService {
     constructor(private db: DrizzleClient) {
     }
 
+
+
+    /**
+     * Public create request methos
+     * 
+     * @param data 
+     * @returns Promise<id>
+     */
     public async createRequest(data: CreateRequestDto) {
         console.log("createRequest data", data);
-        const [result] = await this.db.insert(request)
+        const [req] = await this.db.insert(request)
             .values(data)
             .returning({ id: request.id });
 
-        return result.id
+        return req.id
     }
 
-    public async updateStatus(requestId: string, status: StatusEnum) {
-        const [result] = await this.db.update(request).set({
-            status
+
+
+    /**
+     * Private update request status method
+     * 
+     * @param data 
+     * @returns Promice<id>
+     */
+    private async updateStatus({tx, status, requestId, result}: UpdateStatusDto) {
+        const [req] = await tx.update(request).set({
+            status,
+            result
         }).where(eq(request.id, requestId) && ne(request.status, status))
         .returning({id: request.id});
+
+        if(!req) {
+            throw new NotFoundException();
+        }
         
-        return result.id;
+        return req.id;
     }
 
-    public async getRequestById(id: string) {
-        const result = await this.db
+
+
+    /**
+     * Private get request by id method
+     * 
+     * @param id 
+     * @param tx 
+     * @returns GetRequestDto
+     */
+    private async getById(id: string, tx: TransactionType) {
+        const result = await tx
             .query.request
             .findFirst({
                 where: eq(request.id, id)
             });
 
         if(!result) {
-            throw Error("Not found!");
+            throw new NotFoundException
         }
 
         return result;
     }
 
+
+    
+    /**
+     * 
+     * @param requestId
+     * @param result 
+     * @param status 
+     * @returns Promise<id>
+     */
+    public async changeRequestStatus({requestId, status, result} :ChangeRequestStatusDto) {
+        return this.db.transaction(async (tx)=> {
+            const req = await this.getById(requestId, tx);
+            let updateStatus: StatusEnum;
+
+            switch(status) {
+                case COMPLETED:
+                    updateStatus = COMPLETED;
+                    if(req.status !== WORKING) {
+                        throw new BadRequestException
+                    }
+                    break;
+                case CANCELED:
+                    updateStatus = CANCELED;
+                    if([CANCELED, COMPLETED].includes(req.status)) {
+                        throw new BadRequestException
+                    }
+                    break;
+                case WORKING:
+                    updateStatus = WORKING;
+                    if(req.status !== NEW) {
+                        throw new BadRequestException
+                    }
+                    break;
+                default:
+                    throw new BadRequestException
+                }
+
+            return this.updateStatus({requestId, status: updateStatus, tx, result});
+        });
+    }
+
+
+
+    /**
+     * 
+     * @returns Promice<requestId[]>
+     */
     public async cancelAllOnWorking() {
         const result = await this.db
             .update(request)
             .set({ status: CANCELED })
             .where(eq(request.status, WORKING))
             .returning({ id: request.id });
-        //this.hasData(result);
         if(!result.length) {
-            throw Error("")
+            throw new NotFoundException
         }
 
         return result.map(r => r.id);
-    }
-
-    private hasData(arr: any) {
-        if(!arr.length) {
-            throw Error()
-        }
     }
 }

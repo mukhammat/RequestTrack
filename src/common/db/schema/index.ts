@@ -14,6 +14,7 @@ export const request = table("request", {
     subject: t.varchar("subject", { length: 256 }).notNull(),
     text: t.text("text").notNull(),
     status: RequestStatusEnum().notNull().default('new'),
+    result: t.text("result"),
     created_at: t.timestamp('created_at', { mode: 'string', withTimezone: true })
     .defaultNow(),
     updated_at: t.timestamp('updated_at')
