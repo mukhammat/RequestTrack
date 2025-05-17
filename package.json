@@ -6,7 +6,9 @@
         "test": "echo \"Error: no test specified\" && exit 1",
         "dev": "nodemon -w src -e ts,js,json -i dist -x \"ts-node -r tsconfig-paths/register src/index.ts\"",
         "start": "node -r tsconfig-paths/register dist/src/index.js",
-        "build": "tsc -p . && tsc-alias"
+        "build": "tsc -p . && tsc-alias",
+        "generate": "npx drizzle-kit generate",
+        "migrate": "npx drizzle-kit migrate"
     },
     "keywords": [],
     "author": "",
