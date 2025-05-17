@@ -30,7 +30,7 @@ export class RequestRouter implements IRequestRouter {
             validate("body", ResultSchema),
             validate("params", ChangeRequestStatusSchema),
             this.bindAsyncHandler("changeRequestStatus"))
-        .patch("/requests",
+        .get("/requests",
             this.bindAsyncHandler("getAllRequest"))
     }
 }
