@@ -1,7 +1,7 @@
-import "dotenv/config";
 import express from "express";
-import router from "./routers";
 import cors from "cors";
+
+import router from "./routers";
 import { errorHanler } from "@middleware";
 
 const app = express();

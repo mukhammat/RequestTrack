@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { Express } from "express";
 import app from "./app";
 import { db } from "@db";
@@ -18,8 +19,10 @@ const PORT = process.env.PORT || 3000;
             process.exit(0);
         };
 
-        // process.on("SIGINT", gracefulShutdown);
-        // process.on("SIGTERM", gracefulShutdown);
+        if(process.env.NODE_ENV === "production") {
+            process.on("SIGINT", gracefulShutdown);
+            process.on("SIGTERM", gracefulShutdown);
+        }
 
     } catch (error) {
         console.error("Failed to start server:", error);
