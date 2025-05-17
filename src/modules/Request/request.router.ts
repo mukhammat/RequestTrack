@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { IRequestController, CreateRequestSchema } from ".";
+import { IRequestController, CreateRequestSchema, ChangeRequestStatusSchema, UuidSchecma, ResultSchema } from ".";
 import { validate, asyncWrapper } from "@middleware";
 
 interface IRequestRouter {
@@ -26,9 +26,11 @@ export class RequestRouter implements IRequestRouter {
             this.bindAsyncHandler("createRequest"))
         .patch("/cancel-all", 
             this.bindAsyncHandler("cancelAllOnWorking"))
-        .patch("/take-request", this.bindAsyncHandler("takeRequest"))
-        .patch("/cancel", this.bindAsyncHandler("cancelRequest"))
-        .patch("/complete", this.bindAsyncHandler("completeRequest"))
-        .get("/get-all", this.bindAsyncHandler("getAllRequest"))
+        .patch("/requests/:requestId/status/:status",
+            validate("body", ResultSchema),
+            validate("params", ChangeRequestStatusSchema),
+            this.bindAsyncHandler("changeRequestStatus"))
+        .patch("/requests",
+            this.bindAsyncHandler("getAllRequest"))
     }
 }

@@ -42,6 +42,16 @@ export type ChangeRequestStatusDto = {
     result?: string,
 }
 
+export type GetAllRequestDto = {
+    date?: string
+    from?: string
+    to?: string
+}
+
+export type Options = {
+    where?: any
+}
+
 import {z} from "zod"
 
 export const CreateRequestSchema = z.object({
@@ -53,12 +63,20 @@ export const CreateRequestSchema = z.object({
         .max(255, "more than 255 chars"),
 });
 
-export type GetAllRequestDto = {
-    date?: string
-    from?: string
-    to?: string
-}
+export const StatusZodEnum = z.enum([
+    NEW,
+    WORKING,
+    COMPLETED,
+    CANCELED
+])
 
-export type Options = {
-    where?: any
-}
+export const ChangeRequestStatusSchema = z.object({
+    requestId: z.string().uuid("not uuid type"),
+    status: StatusZodEnum
+});
+
+export const ResultSchema = z.object({
+    result: z.string().optional()
+});
+
+export const UuidSchecma = z.string().uuid("not uuid type");

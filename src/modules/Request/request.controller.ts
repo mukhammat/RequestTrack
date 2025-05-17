@@ -1,25 +1,20 @@
-import { CANCELED, COMPLETED, IRequestService, WORKING } from ".";
+import { CANCELED, ChangeRequestStatusDto, COMPLETED, IRequestService, StatusEnum, WORKING } from ".";
 import { Request, Response } from "express";
 
 export interface IRequestController {
     createRequest(req: Request, res: Response): Promise<void>
     cancelAllOnWorking(_req: Request, res: Response): Promise<void>
-    takeRequest(req: Request, res: Response): Promise<void>
-    completeRequest(req: Request, res: Response): Promise<void>
-    cancelRequest(req: Request, res: Response): Promise<void>
     getAllRequest(req: Request, res: Response): Promise<void>
+    changeRequestStatus(req: Request, res: Response): Promise<void>
 }
 
-export class RequestController {
+export class RequestController implements IRequestController {
     constructor(private requestService: IRequestService) {
     }
 
     public async createRequest(_req: Request, res: Response) {
         const { subject, text } = res.locals.validatedData;
-        console.log("createRequest");
-        console.log("Subject", subject, "/n", "Text", text);
         const id = await this.requestService.createRequest({subject, text});
-        console.log("Id", id);
         res.status(201).send({data: {id}, message: "Request is created!"});
     }
 
@@ -28,28 +23,26 @@ export class RequestController {
         res.status(200).send({data: {result}, message: null});
     }
 
-    public async takeRequest(req: Request, res: Response) {
-        const {requestId} = req.body;
-        await this.requestService.changeRequestStatus({requestId, status: WORKING});
-        res.status(200).send({data: null, message: "Request on wroking"});
-    }
-
-    public async completeRequest(req: Request, res: Response) {
-        const {requestId, result} = req.body;
-        await this.requestService.changeRequestStatus({requestId, status: COMPLETED, result});
-        res.status(200).send({data: null, message: "Request on completed"});
-    }
-
-    public async cancelRequest(req: Request, res: Response) {
-        const {requestId, result} = req.body;
-        await this.requestService.changeRequestStatus({requestId, status: CANCELED, result});
-        res.status(200).send({data: null, message: "Request is canceled"});
-    }
-
     public async getAllRequest(req: Request, res: Response) {
         const {date, from, to} = req.query;
-        console.log("getAllRequest!!");
         const result = await this.requestService.getAllRequest({date, from, to});
         res.status(200).send({data: {result}, message: null});
+    }
+
+    public async changeRequestStatus(req: Request, res: Response) {
+        const {requestId, status} = res.locals.validatedData;
+        const {result} = req.body;
+        
+        const data: ChangeRequestStatusDto = {
+            requestId,
+            status
+        };
+
+        if([COMPLETED, CANCELED].includes(status)){
+            data.result = result
+        }
+
+        await this.requestService.changeRequestStatus(data);
+        res.status(200).send({data: null, message: `Request status is ${status}`});
     }
 }
