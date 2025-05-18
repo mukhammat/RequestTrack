@@ -1,18 +1,18 @@
-import { ErrorRequestHandler } from "express";
-import { HttpException } from "../exceptions";
+import { ErrorRequestHandler } from 'express';
+import { HttpException } from '../exceptions';
 // import { Prisma } from "@prisma/client";
 
 export const errorHanler: ErrorRequestHandler = (error, req, res, next) => {
-    console.log(error);
-    let status = 500;
-    let errorMessage = "Internal server error";
+  console.log(error);
+  let status = 500;
+  let errorMessage = 'Internal server error';
 
-    if (error instanceof HttpException) {
-        status = error.status;
-        errorMessage = error.message;
-    }
+  if (error instanceof HttpException) {
+    status = error.status;
+    errorMessage = error.message;
+  }
 
-    res.status(status).json({
-        message: errorMessage,
-    });
+  res.status(status).json({
+    message: errorMessage,
+  });
 };
