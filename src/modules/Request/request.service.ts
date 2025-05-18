@@ -55,7 +55,7 @@ export class RequestService implements IRequestService {
       .returning({ id: request.id });
 
     if (!req) {
-      throw new NotFoundException();
+      throw new NotFoundException(`Request with id: ${requestId} not found`);
     }
 
     return req.id;
@@ -74,7 +74,7 @@ export class RequestService implements IRequestService {
     });
 
     if (!result) {
-      throw new NotFoundException();
+      throw new NotFoundException(`Request with id: ${id} not found`);
     }
 
     return result;
@@ -96,23 +96,31 @@ export class RequestService implements IRequestService {
         case COMPLETED:
           updateStatus = COMPLETED;
           if (req.status !== WORKING) {
-            throw new BadRequestException();
+            throw new BadRequestException(
+               `Cannot mark request ${requestId} as COMPLETED: current status is "${req.status}", expected "WORKING".`
+            );
           }
           break;
         case CANCELED:
           updateStatus = CANCELED;
           if ([CANCELED, COMPLETED].includes(req.status)) {
-            throw new BadRequestException();
+            throw new BadRequestException(
+              `Cannot cancel request ${requestId}: current status is "${req.status}", expected one of ["NEW", "WORKING"].`
+            );
           }
           break;
         case WORKING:
           updateStatus = WORKING;
           if (req.status !== NEW) {
-            throw new BadRequestException();
+            throw new BadRequestException(
+              `Cannot take request ${requestId} into work: current status is "${req.status}", expected "NEW".`,
+            );
           }
           break;
         default:
-          throw new BadRequestException();
+          throw new BadRequestException(
+            `Invalid status "${status}" provided for request ${requestId}.`
+          );
       }
 
       return this.updateStatus({ requestId, status: updateStatus, tx, result });
@@ -130,7 +138,7 @@ export class RequestService implements IRequestService {
       .where(eq(request.status, WORKING))
       .returning({ id: request.id });
     if (!result.length) {
-      throw new NotFoundException();
+      throw new NotFoundException(`No requests with status ${WORKING} found to cancel.`);
     }
 
     return result.map((r) => r.id);
