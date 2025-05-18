@@ -18,7 +18,6 @@
   "description": "",
   "dependencies": {
     "cors": "^2.8.5",
-    "crypto": "^1.0.1",
     "dotenv": "^16.5.0",
     "drizzle-orm": "^0.43.1",
     "express": "^4.21.2",

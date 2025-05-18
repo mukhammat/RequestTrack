@@ -1,6 +1,5 @@
 import { pgEnum, pgTable as table } from 'drizzle-orm/pg-core';
 import * as t from 'drizzle-orm/pg-core';
-import { randomUUID } from 'crypto';
 
 export const RequestStatusEnum = pgEnum('request_status_enum', [
   'new',
