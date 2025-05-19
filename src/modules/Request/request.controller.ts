@@ -3,8 +3,6 @@ import {
   ChangeRequestStatusDto,
   COMPLETED,
   IRequestService,
-  StatusEnum,
-  WORKING,
 } from '.';
 import { Request, Response } from 'express';
 

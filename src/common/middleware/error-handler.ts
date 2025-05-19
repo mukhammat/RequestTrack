@@ -1,6 +1,5 @@
 import { ErrorRequestHandler } from 'express';
 import { HttpException } from '../exceptions';
-// import { Prisma } from "@prisma/client";
 
 export const errorHanler: ErrorRequestHandler = (error, _req, res, _next) => {
   console.log(error);

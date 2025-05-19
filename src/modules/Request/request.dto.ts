@@ -1,26 +1,12 @@
+import { InferResultType } from '@db';
+
 export const NEW = 'new',
   WORKING = 'working',
   COMPLETED = 'completed',
   CANCELED = 'canceled';
 
-const Status = {
-  NEW,
-  WORKING,
-  COMPLETED,
-  CANCELED,
-} as const;
-
-export type StatusEnum = (typeof Status)[keyof typeof Status];
-
-export type GetRequestType = {
-  id: string;
-  subject: string;
-  text: string;
-  status: StatusEnum;
-  result: string | null;
-  created_at: Date | null;
-  updated_at: Date | null;
-};
+export type GetRequestType = InferResultType<'request'>;
+export type StatusEnum = GetRequestType['status'];
 
 export type CreateRequestDto = Omit<
   GetRequestType,

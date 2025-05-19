@@ -97,7 +97,7 @@ export class RequestService implements IRequestService {
           updateStatus = COMPLETED;
           if (req.status !== WORKING) {
             throw new BadRequestException(
-               `Cannot mark request ${requestId} as COMPLETED: current status is "${req.status}", expected "WORKING".`
+              `Cannot mark request ${requestId} as COMPLETED: current status is "${req.status}", expected "WORKING".`,
             );
           }
           break;
@@ -105,7 +105,7 @@ export class RequestService implements IRequestService {
           updateStatus = CANCELED;
           if ([CANCELED, COMPLETED].includes(req.status)) {
             throw new BadRequestException(
-              `Cannot cancel request ${requestId}: current status is "${req.status}", expected one of ["NEW", "WORKING"].`
+              `Cannot cancel request ${requestId}: current status is "${req.status}", expected one of ["NEW", "WORKING"].`,
             );
           }
           break;
@@ -119,7 +119,7 @@ export class RequestService implements IRequestService {
           break;
         default:
           throw new BadRequestException(
-            `Invalid status "${status}" provided for request ${requestId}.`
+            `Invalid status "${status}" provided for request ${requestId}.`,
           );
       }
 
